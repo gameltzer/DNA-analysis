@@ -1,0 +1,82 @@
+variant_civic_url                 https://civic.genome.wustl.edu/links/variants/3
+gene                                                                         ABL1
+entrez_id                                                                      25
+variant                                                             BCR-ABL E255K
+summary                         While the efficacy of imatinib has revolutioni...
+variant_groups                                                Imatinib Resistance
+chromosome                                                                      9
+start                                                                 1.33738e+08
+stop                                                                  1.33738e+08
+reference_bases                                                                 G
+variant_bases                                                                   A
+representative_transcript                                       ENST00000318560.5
+ensembl_version                                                                75
+reference_build                                                            GRCh37
+chromosome2                                                                   NaN
+start2                                                                        NaN
+stop2                                                                         NaN
+representative_transcript2                                                    NaN
+variant_types                                  transcript_fusion,missense_variant
+hgvs_expressions                NC_000009.11:g.133738363G>A,NM_005157.5:c.763G...
+last_review_date                                          2019-01-31 10:27:03 UTC
+civic_variant_evidence_score                                                   56
+allele_registry_id                                                     CA16602551
+clinvar_ids                                                                376090
+variant_aliases                               E274K,RS121913448,BCR-ABL GLU255LYS
+assertion_ids                                                                 NaN
+assertion_civic_urls                                                          NaN
+Name: 2, dtype: objectvariant_civic_url                 https://civic.genome.wustl.edu/links/variants/3
+gene                                                                         ABL1
+entrez_id                                                                      25
+variant                                                             BCR-ABL E255K
+summary                         While the efficacy of imatinib has revolutioni...
+variant_groups                                                Imatinib Resistance
+chromosome                                                                      9
+start                                                                 1.33738e+08
+stop                                                                  1.33738e+08
+reference_bases                                                                 G
+variant_bases                                                                   A
+representative_transcript                                       ENST00000318560.5
+ensembl_version                                                                75
+reference_build                                                            GRCh37
+chromosome2                                                                   NaN
+start2                                                                        NaN
+stop2                                                                         NaN
+representative_transcript2                                                    NaN
+variant_types                                  transcript_fusion,missense_variant
+hgvs_expressions                NC_000009.11:g.133738363G>A,NM_005157.5:c.763G...
+last_review_date                                          2019-01-31 10:27:03 UTC
+civic_variant_evidence_score                                                   56
+allele_registry_id                                                     CA16602551
+clinvar_ids                                                                376090
+variant_aliases                               E274K,RS121913448,BCR-ABL GLU255LYS
+assertion_ids                                                                 NaN
+assertion_civic_urls                                                          NaN
+Name: 2, dtype: objectvariant_civic_url                 https://civic.genome.wustl.edu/links/variants/3
+gene                                                                         ABL1
+entrez_id                                                                      25
+variant                                                             BCR-ABL E255K
+summary                         While the efficacy of imatinib has revolutioni...
+variant_groups                                                Imatinib Resistance
+chromosome                                                                      9
+start                                                                 1.33738e+08
+stop                                                                  1.33738e+08
+reference_bases                                                                 G
+variant_bases                                                                   A
+representative_transcript                                       ENST00000318560.5
+ensembl_version                                                                75
+reference_build                                                            GRCh37
+chromosome2                                                                   NaN
+start2                                                                        NaN
+stop2                                                                         NaN
+representative_transcript2                                                    NaN
+variant_types                                  transcript_fusion,missense_variant
+hgvs_expressions                NC_000009.11:g.133738363G>A,NM_005157.5:c.763G...
+last_review_date                                          2019-01-31 10:27:03 UTC
+civic_variant_evidence_score                                                   56
+allele_registry_id                                                     CA16602551
+clinvar_ids                                                                376090
+variant_aliases                               E274K,RS121913448,BCR-ABL GLU255LYS
+assertion_ids                                                                 NaN
+assertion_civic_urls                                                          NaN
+Name: 2, dtype: object
