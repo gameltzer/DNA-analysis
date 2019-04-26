@@ -6,6 +6,9 @@ def downloadTsv(location, name):
     result = urlretrieve(location,name)
     print("The file has been downloaded as {0}".format(result[0]))
 
+# These are useful for regular expressions. This is the single letter form. The lowercase characters are included just in case. 
+aminoAcidSymbols= "ACDEFGHIKLMNPQRSTVWY"
+aminoAcidSymbols= aminoAcidSymbols+aminoAcidSymbols.lower()
 
 evidenceUrl="https://civicdb.org/downloads/nightly/nightly-ClinicalEvidenceSummaries.tsv"
 variantUrl="https://civicdb.org/downloads/nightly/nightly-VariantSummaries.tsv"
@@ -54,4 +57,26 @@ def transform(extractOutput):
     # This filters the variants dataframe so that we only have rows where the variant_types consists of a missense and only a missense. 
     filteredVariant = filteredVariant[filteredVariant.variant_types.str.match("missense_variant")]
     # There are now 717 rows in filtered variants as opposeed t0 2185. 
+
+    # This regex will be used to select all entries that have amino acid positional information in the variant field. 
+    regexForAAPosition="[{0}]{{1}}[0-9]+[{0}]?".format(aminoAcidSymbols)
+    filteredVariant = filteredVariant[(filteredVariant.variant.str.contains(pat=regexForAAPosition, regex=True)) | (filteredVariant.hgvs_expressions.notna())]
+    
+    # these next few lines make sure that only the specific variant entries remain.
+    nonspecificRegex = regexForAAPosition+ r"\D+[\d\D]*" + regexForAAPosition
+
+    specificRegexWCapture = r"[{0}]{{1}}([0-9]+)[{0}]?".format(aminoAcidSymbols)
+    specificRegexWGroup = r"\D+[\d\D]*[{0}]{{1}}\1[{0}]?".format(aminoAcidSymbols)
+    specificRegex = specificRegexWCapture +  specificRegexWGroup
+    filteredVariant = filteredVariant[(filteredVariant.variant.str.contains(pat=specificRegex, regex=True)) | ~(filteredVariant.variant.str.contains(pat=nonspecificRegex, regex=True))  ]
+   
+   
+    # TODO check to see if greediness or non-greediness is preferable
+    #There are now 711 variants as opposed to 2185
+    # TODO print length and status of variants at the moment.
+
+filteredEvidence.merge(how="inner",left_on="variant_id", right=filteredVariant, right_index=True )
+## 524
+filteredEvidence[filteredEvidence.variant_id.isin(filteredVariant.index)]
     return (filteredEvidence, filteredVariant)
+

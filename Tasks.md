@@ -16,7 +16,7 @@
 8. ~~~Assumption: exclude entries listed in evidence file that do not relate to therapies.~~~
 9. ~~~Assumption: exclude entries in variants files that are not missense variants. ~~~
 10.~~~ Assumption: exclude entries in variants file that is combined missense and another type.~~~ 
-11. Assumption: Exclude variatns that don't relate to a single AA position (some questions exist about this)
+11. ~~~Assumption: Exclude variatns that don't relate to a single AA position (some questions exist about this)~~~d
 12. Assumption: exclude all evidence that does not relate to missense variants (might require joins)
 13. Assumption: remove all variants removed by the remaining evidence (might require joins)
 14. Assumption: create evidence_drug table ; one drug should exist per row; map to drugs column.
