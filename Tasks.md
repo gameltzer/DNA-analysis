@@ -17,9 +17,12 @@
 9. ~~~Assumption: exclude entries in variants files that are not missense variants. ~~~
 10.~~~ Assumption: exclude entries in variants file that is combined missense and another type.~~~ 
 11. ~~~Assumption: Exclude variatns that don't relate to a single AA position (some questions exist about this)~~~d
-12. Assumption: exclude all evidence that does not relate to missense variants (might require joins)
-13. Assumption: remove all variants removed by the remaining evidence (might require joins)
+12.~~~ Assumption: exclude all evidence that does not relate to missense variants (might require joins)~~~
+13. ~~~Assumption: remove all variants removed by the remaining evidence (might require joins)~~~e
 14. Assumption: create evidence_drug table ; one drug should exist per row; map to drugs column.
 15. Assumption: create variant_aliases in the tabl; map to variant_id. 
 16. extract amino acid position from each variant and make it a new field.
 17. Output the DB into a file.
+18. Revise Readme. 
+19. Write overview. ( time as of thursday 16 hours, 30 minutes)
+19. Test code and check to make sure it works. Pay special attention to things specified in TODO statements (time as of friday is 24 hours)
