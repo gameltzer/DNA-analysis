@@ -1,5 +1,7 @@
 from urllib import urlretrieve
 import pandas
+import sqlite3
+import sqlalchemy
 
 def downloadTsv(location, name):
     print("downloading contents of {0}".format(location)) 
@@ -23,18 +25,13 @@ downloadTsv(variantUrl,variantFile)
 def extract():
     # Some of the rows are read as having more columns than they expect. This issue appears to be resolved by including use cols, which apparently tells it to explicitly expect that greater number of columns. 
     # Only the python engine appears to know how to do this, which is why Python is specified. 
-    evidence = pandas.read_csv(evidenceFile, "\t", engine="c")
-    variant = pandas.read_csv(variantFile, "\t", engine="python", usecols=range(1,31))
+    evidence = pandas.read_csv(evidenceFile, "\t", engine="c", encoding='latin-1')
+    variant = pandas.read_csv(variantFile, "\t", engine="python", encoding='latin-1', usecols=range(1,31))
     # this allows us to use the index field, and rename it to variant_id. 
     variant = variant.reset_index()
     # This changes the column representing the old index back to variant_id.
     variant =variant.rename(columns={"index": "variant_id"})
     return (evidence,variant)    
-
-    evidence, variant = extract()
-    print(evidence.head())
-    print("n")
-    print(variant.head())
     # print(variant.head() + "\n" )
     # print(evidence.head())
 
@@ -45,6 +42,7 @@ def transform(extractOutput):
     evidence, variant = extractOutput
         # This gets us only the evidence that concerns particular drugs. This is an assumption that is made. The variable filtered Evidence will be reused as we continue to transform and clean the data.
     filteredEvidence = evidence[evidence.drugs.notna()]
+ 
     # There are now va rows in filteredEvidence as opposed to 2764
     # TODO: print out length and status of evidence at the moment. 
 
@@ -61,7 +59,7 @@ def transform(extractOutput):
     filteredVariant = filteredVariant[filteredVariant.variant_types.str.match("missense_variant")]
     # There are now 717 rows in filtered variants as opposeed t0 2185. 
 
-    # This regex will be used to select all entries that have amino acid positional information in the variant field. 
+    # This regex will be used to select all entries that contain, within the variant field, the following information in this order: a variant description information describing the refererence amino acid, the position in the sequence, and possibly the amino acid in the variant. Amino acids are referred to by the single letter symbols, rather than the triple letter symbols.
     regexForAAPosition="[{0}]{{1}}[0-9]+[{0}]?".format(aminoAcidSymbols)
     filteredVariant = filteredVariant[(filteredVariant.variant.str.contains(pat=regexForAAPosition, regex=True)) | (filteredVariant.hgvs_expressions.notna())]
     
@@ -132,7 +130,7 @@ def transform(extractOutput):
     variant_alias = variant_alias.rename(columns={"variant_aliases":"alias"})
 
 
-    # TODO: write description of what this does. Include the assumption that multiple variants aliases are delimited by a comma, and nothing else. The assumption is also made that those with missing values in the alias column can be removed from the DataFrame. Also, mention the potential roadblock of wondering if variant aliases are the same thing as amino acid positions, and if they are different, how are they different? The notation definitely appears to be amino acid positions in many cases.
+    # TODO: write description of what this does. Include the assumption that multiple variants aliases are delimited by a comma, and nothing else. The assumption is also made that those with missing values in the alias column can be removed from the DataFrame. Also, mention the potential roadblock of wondering if variant aliases are the same thing as the previously defined variant descriptions, and if they are different, how are they different? The notation definitely appears to be variant descriptions in many cases.
     variant_alias = variant_alias[variant_alias.alias.notna()]
     multiple_aliases = variant_alias[variant_alias.alias.str.contains(",")] 
     single_alias = variant_alias[~(variant_alias.alias.str.contains(","))]
@@ -149,8 +147,36 @@ def transform(extractOutput):
     variant_alias = multiple_aliases.append(single_alias)
     #TODO : print length and status of dataframe variant_alias
     #TODO : Confirm that this works.
-    
+
+    # This is for creating a new AA position column. The default value is NaN.
+    filteredVariant.insert(len(variant.columns), "aa_position", float('nan'))
+    # the regex to find amino acids. Because of the earlier filtering, the assumption si made that each variant field should only have one variant description in most cases. If it does not, the numerical portion will be the same, and therefore, we only need concern ourselves with the first variant description. 
+    # TODO write detailed description of what the below does. 
+    convertAARegex = r"\W*[{0}]{{1}}([0-9]+)[{0}]?\W*".format(aminoAcidSymbols)
+    aaPos= filteredVariant.variant.str.extract(pat=convertAARegex)
+    aaPos =aaPos.rename(columns={0:"aa_position"})
+    filteredVariant.update(aaPos)
+    # TODO print status of operation.     
+    #TODO check to see that this works correctly.Focus on regular expressions.
     return (filteredEvidence, filteredVariant, evidence_drug, variant_alias)
 
+def load(transform_output):
+    engine = sqlalchemy.create_engine('sqlite:///assessment.db')
+    #Refining the DataFrames for the desired output
+    evidence, variant, evidence_drug, variant_alias = transform_output
+    evidence = evidence.loc[:,["evidence_id", "disease", "evidence_type", "evidence_direction","clinical_significance", "evidence_level", "citation_id","variant_id"]]
+    variant = variant.loc[:,["variant_id", "gene", "entrez_id", "variant", "aa_position"]]
+    evidence_drug = evidence_drug.rename(columns={"drugs":"drug"})
+    evidence_drug = evidence_drug.loc[:,["evidence_id", "drug"]]
+    variant_alias = variant_alias.loc[:,["variant_id", "alias"]]
+    evidence =evidence.astype(dtype={"variant_id":"int32", "evidence_id":"int32"})
+    variant = variant.astype(dtype={"variant_id":"int32"})
+    evidence_drug = evidence_drug.astype(dtype={"evidence_id":"int32"})
+    variant_alias = variant_alias.astype(dtype={"variant_id":"int32"})
+    evidence.to_sql("evidence", engine)
+    variant.to_sql("variant", engine)
+    evidence_drug.to_sql("evidence_drug", engine)
+    variant_alias.to_sql("variant_alias",engine)
+    # check variant_id# 12
 
-# TODO write expression combining extract, transform and load so the statements are actually executed.
+load(transform(extract()))
