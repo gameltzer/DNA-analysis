@@ -4,11 +4,13 @@
 # * Python 2.7.15 (64 bit)
 # * Project Length ~ 30 hours
 
-
 from urllib import urlretrieve
 import pandas
 import sqlite3
 import sqlalchemy
+
+
+
 
 def downloadTsv(location, name):
     print("downloading contents of {0}".format(location)) 
@@ -28,45 +30,60 @@ variantFile="variant.tsv"
 downloadTsv(evidenceUrl, evidenceFile)
 downloadTsv(variantUrl,variantFile)
 
-# This performs the extraction. A tuble is returned with the variant first, and the evidence second. 
+
+
+
+
+
+
+
+
+# This performs the extraction. A tuble is returned with the evidence  as the first component, and the variant as the second. 
 def extract():
-    # Some of the rows are read as having more columns than is expected by the C engine for *variant*. This issue appears to be resolved by including 'usecols' argument, which apparently tells it to explicitly expect that greater number of columns. 
-    # Only the python engine appears to know how to do this, which is why Python is specified
-    # The specification of the encoding enabled `pandas` to correctly convert to sqlite3. 
+
+    # The specification of the encoding enabled `pandas` to correctly convert to sqlite3. The \t allows the function to treat tabs as the separator, rather than commas.
     evidence = pandas.read_csv(evidenceFile, "\t", encoding='latin-1')
-    # variant = pandas.read_csv(variantFile, "\t", encoding='latin-1')
+
+    # When reading the variantFile CSV with the default C engine, there are some parser complaints about the file having more columns than expected by the C engine. This issue is resolved by including 'usecols' argument, which apparently tells it to explicitly expect that greater number of columns. Only the python engine appears to know how to do this, which is why Python is specified as the engine. 
     variant = pandas.read_csv(variantFile, "\t", engine="python", encoding='latin-1', usecols=range(1,31))
-    # this allows us to use the index field, and rename it to variant_id. 
+    
+
+    # This creates a new index. This is necessary in order to be able to name the existing index as variant_id, which is not retained by pandas. 
     variant = variant.reset_index()
-    # This changes the column representing the old index back to variant_id.
+
+    # This changes the column name of the original index back to variant_id. The new index is of no interest. 
     variant =variant.rename(columns={"index": "variant_id"})
+
     return (evidence,variant)    
-    # print(variant.head() + "\n" )
-    # print(evidence.head())
 
 
-    # These are all the transform operations, including data cleaning. The evidence and the variant are returned as a tuple. Occasionally, missing values need to be handled, and operations are included to handle the
-    # missing values. The input ecpected is a tuple of two, with the first element containing the data of `evidence`,  and the second containing the data of `variant`. This is the same as return value of `extract()`. A tuple is returned consisting of the filtered evidence, the filtered variants, the evidence_drug DataFrame, and the variant_alias.
+
+
+
+
+
+
+# These are all the transform operations. A tuple is returned consisting of the filtered evidence, the filtered variants, the evidence_drug DataFrame, and the variant_alias.
 def transform(extractOutput):
+
     evidence, variant = extractOutput
-        # This gets us only the evidence that concerns particular drugs. This is an assumption that is made. The variable filtered Evidence will be reused as we continue to transform and clean the data.
+    
+    # This gets us only the evidence that pertains to drugs; the assumption is made that the rows with missing values are not associated with any particular drug. The variable "filteredEvidence" will be reused as we continue to transform and clean the data.
     filteredEvidence = evidence[evidence.drugs.notna()]
- 
-    # There are now va rows in filteredEvidence as opposed to 2764
     # TODO: print out length and status of evidence at the moment. 
 
-    # Since we have some NaN values present, we filter those out to avoid the possibility of screwing things up. 
+
+    # Since there are missing values present in the variant_types column, these are filtered out. 
     filteredVariant =  variant[variant.variant_types.notna()]
-    # There are now 1309 rows in filtered variants as oppposed to 2185
 
     # This filters everything out that that is not a missense_varaint, although it may not only be a missense_variant. The assumption is made, of course, that there are no misspellings of missense_variant.
     filteredVariant = filteredVariant[filteredVariant.variant_types.str.contains("missense_variant")]
-    # There are now 754 rows in filtered variants as opposed to 2185
     # TODO print length and status of variants at the moment. 
 
-    # This filters the variants dataframe so that we only have rows where the variant_types consists of a missense and only a missense. 
+
+    # This filters the variants dataframe so that we only have rows where the variant_types consists of a missense_variant and only a missense_variant. 
     filteredVariant = filteredVariant[filteredVariant.variant_types.str.match("missense_variant")]
-    # There are now 717 rows in filtered variants as opposeed t0 2185. 
+
 
     # This regex will be used to select all entries that contain, within the variant field, the following information in this order: a variant description information describing the refererence amino acid, the position in the sequence, and possibly the amino acid in the variant. Amino acids are referred to by the single letter symbols, rather than the triple letter symbols.
     regexForAAPosition="[{0}]{{1}}[0-9]+[{0}]?".format(aminoAcidSymbols)

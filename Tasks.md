@@ -23,8 +23,10 @@
 15. ~~~Assumption: create variant_aliases in the tabl; map to variant_id. ~~~
 16. ~~~extract amino acid position from each variant and make it a new field.~~~
 17. ~~~ Output the DB into a file.~~~
-18. Incorporate README contents into comments, especially concerning regular expressions.
-19. Write overview. ( time as of thursday 16 hours, 30 minutes) 
-19. Test code and check to make sure it works. Pay special attention to things specified in TODO statements (time as of friday is 24 hours)
+18. Incorporate README contents into comments, especially concerning regular expressions. Revise comments and style of code, and fill in TODO statements relevant to comments.
+19. Check database output to make sure that nothing is ommitted. 
+20. revise overview.
+21. Check regular expressions and other aspects of code, and add things specified in TODO statements. )
+22. Rerun code to make sure none of the stylistic revisions or other additions created any errors.
 
 (time as of Saturday is 30 hours)
