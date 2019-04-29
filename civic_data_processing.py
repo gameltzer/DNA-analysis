@@ -1,3 +1,10 @@
+## Overview of CiViC Data Processing
+# * Gabriel Meltzer
+# * Started on 4/23/2019
+# * Python 2.7.15 (64 bit)
+# * Project Length ~ 30 hours
+
+
 from urllib import urlretrieve
 import pandas
 import sqlite3
@@ -23,9 +30,11 @@ downloadTsv(variantUrl,variantFile)
 
 # This performs the extraction. A tuble is returned with the variant first, and the evidence second. 
 def extract():
-    # Some of the rows are read as having more columns than they expect. This issue appears to be resolved by including use cols, which apparently tells it to explicitly expect that greater number of columns. 
-    # Only the python engine appears to know how to do this, which is why Python is specified. 
-    evidence = pandas.read_csv(evidenceFile, "\t", engine="c", encoding='latin-1')
+    # Some of the rows are read as having more columns than is expected by the C engine for *variant*. This issue appears to be resolved by including 'usecols' argument, which apparently tells it to explicitly expect that greater number of columns. 
+    # Only the python engine appears to know how to do this, which is why Python is specified
+    # The specification of the encoding enabled `pandas` to correctly convert to sqlite3. 
+    evidence = pandas.read_csv(evidenceFile, "\t", encoding='latin-1')
+    # variant = pandas.read_csv(variantFile, "\t", encoding='latin-1')
     variant = pandas.read_csv(variantFile, "\t", engine="python", encoding='latin-1', usecols=range(1,31))
     # this allows us to use the index field, and rename it to variant_id. 
     variant = variant.reset_index()

@@ -23,8 +23,8 @@
 15. ~~~Assumption: create variant_aliases in the tabl; map to variant_id. ~~~
 16. ~~~extract amino acid position from each variant and make it a new field.~~~
 17. ~~~ Output the DB into a file.~~~
-18. Revise Readme. 
-19. Write overview. ( time as of thursday 16 hours, 30 minutes)
+18. Incorporate README contents into comments, especially concerning regular expressions.
+19. Write overview. ( time as of thursday 16 hours, 30 minutes) 
 19. Test code and check to make sure it works. Pay special attention to things specified in TODO statements (time as of friday is 24 hours)
 
-(time as of Saturday is 39 hours)ki
+(time as of Saturday is 30 hours)
